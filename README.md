@@ -1,4 +1,4 @@
-# AWS-Istio-Opensearch
+# AWS EKS-Istio-Opensearch
 
 E-commerce microservices application. This is the application layer of a larger
 project that will eventually be deployed to EKS with Istio for service mesh,
