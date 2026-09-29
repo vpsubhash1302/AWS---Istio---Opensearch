@@ -1,0 +1,150 @@
+services:
+  user-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user_db
+    volumes:
+      - ./services/user-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  product-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: product_db
+    volumes:
+      - ./services/product-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  cart-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cart_db
+    volumes:
+      - ./services/cart-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  order-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: order_db
+    volumes:
+      - ./services/order-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  payment-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payment_db
+    volumes:
+      - ./services/payment-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgres://postgres:postgres@user-db:5432/user_db
+      JWT_SECRET: change-me-in-production
+      LOG_LEVEL: info
+    depends_on:
+      user-db:
+        condition: service_healthy
+
+  product-service:
+    build: ./services/product-service
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      DATABASE_URL: postgres://postgres:postgres@product-db:5432/product_db
+      LOG_LEVEL: info
+    depends_on:
+      product-db:
+        condition: service_healthy
+
+  cart-service:
+    build: ./services/cart-service
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      DATABASE_URL: postgres://postgres:postgres@cart-db:5432/cart_db
+      LOG_LEVEL: info
+    depends_on:
+      cart-db:
+        condition: service_healthy
+
+  order-service:
+    build: ./services/order-service
+    ports:
+      - "3004:3004"
+    environment:
+      PORT: 3004
+      DATABASE_URL: postgres://postgres:postgres@order-db:5432/order_db
+      CART_SERVICE_URL: http://cart-service:3003
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      PAYMENT_SERVICE_URL: http://payment-service:3005
+      LOG_LEVEL: info
+    depends_on:
+      order-db:
+        condition: service_healthy
+      cart-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+
+  payment-service:
+    build: ./services/payment-service
+    ports:
+      - "3005:3005"
+    environment:
+      PORT: 3005
+      DATABASE_URL: postgres://postgres:postgres@payment-db:5432/payment_db
+      LOG_LEVEL: info
+    depends_on:
+      payment-db:
+        condition: service_healthy
+
+  web-frontend:
+    build: ./services/web-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - user-service
+      - product-service
+      - cart-service
+      - order-service

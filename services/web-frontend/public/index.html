@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ShopMesh</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>ShopMesh</h1>
+    <nav>
+      <button data-view="products">Products</button>
+      <button data-view="cart">Cart</button>
+      <button data-view="orders">Orders</button>
+    </nav>
+    <div id="auth-status"></div>
+  </header>
+
+  <main>
+    <section id="view-auth" class="view">
+      <div class="auth-forms">
+        <form id="login-form">
+          <h2>Login</h2>
+          <input name="email" type="email" placeholder="Email" required />
+          <input name="password" type="password" placeholder="Password" required />
+          <button type="submit">Login</button>
+        </form>
+        <form id="register-form">
+          <h2>Register</h2>
+          <input name="name" type="text" placeholder="Name" required />
+          <input name="email" type="email" placeholder="Email" required />
+          <input name="password" type="password" placeholder="Password" required />
+          <button type="submit">Register</button>
+        </form>
+      </div>
+      <p id="auth-message"></p>
+    </section>
+
+    <section id="view-products" class="view hidden">
+      <h2>Products</h2>
+      <div id="products-list" class="grid"></div>
+    </section>
+
+    <section id="view-cart" class="view hidden">
+      <h2>Your Cart</h2>
+      <div id="cart-list"></div>
+      <button id="checkout-btn">Checkout</button>
+      <p id="cart-message"></p>
+    </section>
+
+    <section id="view-orders" class="view hidden">
+      <h2>Your Orders</h2>
+      <div id="orders-list"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

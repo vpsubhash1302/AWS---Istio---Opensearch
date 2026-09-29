@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS orders (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  total NUMERIC(10, 2) NOT NULL,
+  payment_transaction_id VARCHAR(64),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+  id SERIAL PRIMARY KEY,
+  order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  product_id INTEGER NOT NULL,
+  quantity INTEGER NOT NULL,
+  unit_price NUMERIC(10, 2) NOT NULL
+);
